@@ -17,9 +17,18 @@ export function CuneiformGrid({ searchQuery }: CuneiformGridProps) {
   const fetchSigns = async () => {
     try {
       const response = await fetch('/api/signs')
+      if (!response.ok) {
+        throw new Error('Failed to fetch signs')
+      }
       const data = await response.json()
+      // Ensure data is an array
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid data format received from server')
+      }
       setSigns(data)
     } catch (error) {
+      console.error('Error fetching signs:', error)
+      setSigns([]) // Reset to empty array on error
       toast({
         title: "Error",
         description: "Failed to fetch signs",
@@ -100,6 +109,7 @@ export function CuneiformGrid({ searchQuery }: CuneiformGridProps) {
           })
         }
       },
+      refreshSigns: fetchSigns,
     }
   }, [signs])
 

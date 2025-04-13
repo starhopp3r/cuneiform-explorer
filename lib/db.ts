@@ -14,10 +14,16 @@ async function ensureDataDir() {
   }
 }
 
-// Initialize the database with default data if it doesn't exist
+// Initialize the database with empty array if it doesn't exist
 async function initializeDb() {
   try {
     await fs.access(DB_PATH)
+    // Verify the file contains valid JSON
+    const data = await fs.readFile(DB_PATH, 'utf-8')
+    const parsed = JSON.parse(data)
+    if (!Array.isArray(parsed)) {
+      throw new Error('Invalid data format in database file')
+    }
   } catch {
     await ensureDataDir()
     await fs.writeFile(DB_PATH, JSON.stringify(initialSigns, null, 2))
@@ -27,14 +33,31 @@ async function initializeDb() {
 // Get all signs
 export async function getSigns(): Promise<CuneiformSign[]> {
   await initializeDb()
-  const data = await fs.readFile(DB_PATH, 'utf-8')
-  return JSON.parse(data)
+  try {
+    const data = await fs.readFile(DB_PATH, 'utf-8')
+    const signs = JSON.parse(data)
+    if (!Array.isArray(signs)) {
+      throw new Error('Invalid data format in database file')
+    }
+    return signs
+  } catch (error) {
+    console.error('Error reading signs:', error)
+    // If there's an error reading the file, return empty array
+    return []
+  }
 }
 
 // Add a new sign
 export async function addSign(sign: CuneiformSign): Promise<void> {
   const signs = await getSigns()
   signs.push(sign)
+  await fs.writeFile(DB_PATH, JSON.stringify(signs, null, 2))
+}
+
+// Add multiple signs
+export async function addSigns(signsToAdd: CuneiformSign[]): Promise<void> {
+  const signs = await getSigns()
+  signs.push(...signsToAdd)
   await fs.writeFile(DB_PATH, JSON.stringify(signs, null, 2))
 }
 
