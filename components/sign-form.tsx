@@ -65,6 +65,7 @@ export function SignForm({ open, onOpenChange }: SignFormProps) {
     }
 
     try {
+      setIsImporting(true)
       // Parse the import text into signs
       const lines = importText.trim().split("\n")
       const newSigns = lines.map(line => {
@@ -85,27 +86,27 @@ export function SignForm({ open, onOpenChange }: SignFormProps) {
         return
       }
 
-      const response = await fetch("/api/signs/batch", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newSigns),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to import signs")
+      // Get existing signs from localStorage
+      const existingSigns = window.cuneiformStore.getSigns()
+      const existingSignMap = new Map(existingSigns.map(sign => [sign.sign, true]))
+      
+      // Filter out duplicates
+      const uniqueNewSigns = newSigns.filter(sign => !existingSignMap.has(sign.sign))
+      
+      if (uniqueNewSigns.length > 0) {
+        // Add all new signs at once
+        const updatedSigns = [...existingSigns, ...uniqueNewSigns]
+        localStorage.setItem('cuneiform_signs', JSON.stringify(updatedSigns))
+        window.cuneiformStore.refreshSigns()
       }
 
-      const result = await response.json()
       toast({
         title: "Success",
-        description: `Successfully imported ${result.imported} signs${result.skipped > 0 ? ` (${result.skipped} duplicates skipped)` : ''}`,
+        description: `Successfully imported ${uniqueNewSigns.length} signs${newSigns.length - uniqueNewSigns.length > 0 ? ` (${newSigns.length - uniqueNewSigns.length} duplicates skipped)` : ''}`,
       })
       setImportText("")
       setShowImport(false)
       onOpenChange(false)
-      window.cuneiformStore.refreshSigns()
     } catch (error) {
       console.error("Error importing signs:", error)
       toast({
@@ -113,6 +114,8 @@ export function SignForm({ open, onOpenChange }: SignFormProps) {
         description: "Failed to import signs",
         variant: "destructive",
       })
+    } finally {
+      setIsImporting(false)
     }
   }
 
@@ -123,14 +126,24 @@ export function SignForm({ open, onOpenChange }: SignFormProps) {
       name: values.name,
     }
 
-    if (window.cuneiformStore) {
-      window.cuneiformStore.addSign(newSign)
+    try {
+      const currentSigns = window.cuneiformStore.getSigns()
+      const updatedSigns = [...currentSigns, newSign]
+      localStorage.setItem('cuneiform_signs', JSON.stringify(updatedSigns))
+      window.cuneiformStore.refreshSigns()
       form.reset()
       toast({
         title: "Sign added",
         description: "The cuneiform sign has been added successfully.",
       })
       onOpenChange(false)
+    } catch (error) {
+      console.error("Error adding sign:", error)
+      toast({
+        title: "Error",
+        description: "Failed to add sign",
+        variant: "destructive",
+      })
     }
   }
 

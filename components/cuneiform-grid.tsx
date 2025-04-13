@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { CuneiformCard } from "@/components/cuneiform-card"
 import { type CuneiformSign } from "@/lib/data"
 import { useToast } from "@/components/ui/use-toast"
+import { initialSigns } from "@/lib/data"
 
 interface CuneiformGridProps {
   searchQuery: string
@@ -13,44 +14,35 @@ export function CuneiformGrid({ searchQuery }: CuneiformGridProps) {
   const [signs, setSigns] = useState<CuneiformSign[]>([])
   const { toast } = useToast()
 
-  // Fetch signs from the API
-  const fetchSigns = async () => {
-    try {
-      const response = await fetch('/api/signs')
-      if (!response.ok) {
-        throw new Error('Failed to fetch signs')
-      }
-      const data = await response.json()
-      // Ensure data is an array
-      if (!Array.isArray(data)) {
-        throw new Error('Invalid data format received from server')
-      }
-      setSigns(data)
-    } catch (error) {
-      console.error('Error fetching signs:', error)
-      setSigns([]) // Reset to empty array on error
-      toast({
-        title: "Error",
-        description: "Failed to fetch signs",
-        variant: "destructive",
-      })
-    }
-  }
-
+  // Initialize localStorage and load signs
   useEffect(() => {
-    fetchSigns()
+    try {
+      const storedData = localStorage.getItem('cuneiform_signs')
+      if (!storedData) {
+        // Initialize with default signs if no data exists
+        localStorage.setItem('cuneiform_signs', JSON.stringify(initialSigns))
+        setSigns(initialSigns)
+      } else {
+        const parsedSigns = JSON.parse(storedData)
+        if (!Array.isArray(parsedSigns)) {
+          throw new Error('Invalid data format in storage')
+        }
+        setSigns(parsedSigns)
+      }
+    } catch (error) {
+      console.error('Error initializing signs:', error)
+      // Reset to initial signs if there's an error
+      localStorage.setItem('cuneiform_signs', JSON.stringify(initialSigns))
+      setSigns(initialSigns)
+    }
   }, [])
 
   const handleDelete = async (id: string) => {
     try {
-      await fetch('/api/signs', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id }),
-      })
-      setSigns(signs.filter((sign) => sign.id !== id))
+      const currentSigns = window.cuneiformStore.getSigns()
+      const filteredSigns = currentSigns.filter(sign => sign.id !== id)
+      localStorage.setItem('cuneiform_signs', JSON.stringify(filteredSigns))
+      setSigns(filteredSigns)
       toast({
         title: "Sign removed",
         description: "The cuneiform sign has been removed successfully.",
@@ -66,14 +58,12 @@ export function CuneiformGrid({ searchQuery }: CuneiformGridProps) {
 
   const handleEdit = async (updatedSign: CuneiformSign) => {
     try {
-      await fetch('/api/signs', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedSign),
-      })
-      setSigns(signs.map((sign) => (sign.id === updatedSign.id ? updatedSign : sign)))
+      const currentSigns = window.cuneiformStore.getSigns()
+      const updatedSigns = currentSigns.map(sign => 
+        sign.id === updatedSign.id ? updatedSign : sign
+      )
+      localStorage.setItem('cuneiform_signs', JSON.stringify(updatedSigns))
+      setSigns(updatedSigns)
       toast({
         title: "Sign updated",
         description: "The cuneiform sign has been updated successfully.",
@@ -90,18 +80,28 @@ export function CuneiformGrid({ searchQuery }: CuneiformGridProps) {
   // Make the grid available to other components
   useEffect(() => {
     window.cuneiformStore = {
-      getSigns: () => signs,
-      addSign: async (sign: CuneiformSign) => {
+      getSigns: () => {
         try {
-          await fetch('/api/signs', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(sign),
-          })
-          setSigns([...signs, sign])
+          const data = localStorage.getItem('cuneiform_signs')
+          if (!data) return initialSigns
+          const parsedSigns = JSON.parse(data)
+          if (!Array.isArray(parsedSigns)) {
+            throw new Error('Invalid data format in storage')
+          }
+          return parsedSigns
         } catch (error) {
+          console.error('Error reading signs:', error)
+          return initialSigns
+        }
+      },
+      addSign: (sign: CuneiformSign) => {
+        try {
+          const currentSigns = window.cuneiformStore.getSigns()
+          const newSigns = [...currentSigns, sign]
+          localStorage.setItem('cuneiform_signs', JSON.stringify(newSigns))
+          setSigns(newSigns)
+        } catch (error) {
+          console.error('Error adding sign:', error)
           toast({
             title: "Error",
             description: "Failed to add sign",
@@ -109,9 +109,12 @@ export function CuneiformGrid({ searchQuery }: CuneiformGridProps) {
           })
         }
       },
-      refreshSigns: fetchSigns,
+      refreshSigns: async () => {
+        const currentSigns = window.cuneiformStore.getSigns()
+        setSigns(currentSigns)
+      },
     }
-  }, [signs])
+  }, [])
 
   // Filter signs based on search query
   const filteredSigns = signs.filter((sign) => {

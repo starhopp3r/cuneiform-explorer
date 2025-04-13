@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getSigns, addSigns } from '@/lib/db'
+import { getSigns, addSigns } from '@/lib/storage'
 import { CuneiformSign } from '@/lib/data'
 
 export async function POST(request: Request) {
@@ -7,7 +7,7 @@ export async function POST(request: Request) {
     const signs: CuneiformSign[] = await request.json()
     
     // Get existing signs to check for duplicates
-    const existingSigns = await getSigns()
+    const existingSigns = getSigns()
     const existingSignMap = new Map(existingSigns.map(sign => [sign.sign, true]))
     
     // Filter out duplicates and ensure each sign is valid
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     
     if (newSigns.length > 0) {
       // Add all new signs at once
-      await addSigns(newSigns)
+      addSigns(newSigns)
     }
     
     return NextResponse.json({ 
