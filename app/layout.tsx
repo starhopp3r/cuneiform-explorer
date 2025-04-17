@@ -3,12 +3,13 @@ import "@/app/globals.css"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { RootLayoutClient } from "./layout-client"
+import { ProgressProvider } from "@/lib/progress-context"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Cuneiform Signs",
-  description: "Interactive collection of cuneiform signs and their names",
+  title: "Cuneiform Explorer",
+  description: "Explore and learn cuneiform signs",
   generator: 'v0.dev',
   icons: {
     icon: './icon.ico',
@@ -29,7 +30,9 @@ export default function RootLayout({
         <link rel="shortcut icon" href="/icon.ico" />
       </head>
       <body className={inter.className}>
-        <RootLayoutClient>{children}</RootLayoutClient>
+        <ProgressProvider>
+          <RootLayoutClient>{children}</RootLayoutClient>
+        </ProgressProvider>
       </body>
     </html>
   )
