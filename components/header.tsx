@@ -46,7 +46,7 @@ function SearchInput() {
 }
 
 export function Header() {
-  const { totalSigns, isVisible, setTotalSigns, toggleVisibility } = useProgress()
+  const { totalSigns, isVisible, setTotalSigns, toggleVisibility, isShuffled, toggleShuffle } = useProgress()
   const [maxSigns, setMaxSigns] = useState(0)
   const [memorizeCount, setMemorizeCount] = useState(0)
 
@@ -109,6 +109,14 @@ export function Header() {
                 </DialogHeader>
                 <div className="space-y-6 py-4">
                   <div className="flex items-center justify-between">
+                    <Label htmlFor="shuffle-order">Shuffle Sign Order</Label>
+                    <Switch
+                      id="shuffle-order"
+                      checked={isShuffled}
+                      onCheckedChange={toggleShuffle}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
                     <Label htmlFor="progress-monitoring">Progress Monitoring</Label>
                     <Switch
                       id="progress-monitoring"
@@ -117,7 +125,7 @@ export function Header() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="total-signs">Total Signs</Label>
+                    <Label htmlFor="total-signs">How many signs do you want to learn?</Label>
                     <Input
                       id="total-signs"
                       type="number"
@@ -127,7 +135,7 @@ export function Header() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="memorize-count">How many signs to memorize?</Label>
+                    <Label htmlFor="memorize-count">How many signs do you want to memorize?</Label>
                     <Input
                       id="memorize-count"
                       type="number"

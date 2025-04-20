@@ -5,6 +5,8 @@ import { CuneiformCard } from "@/components/cuneiform-card"
 import { type CuneiformSign } from "@/lib/data"
 import { useToast } from "@/components/ui/use-toast"
 import { initialSigns } from "@/lib/data"
+import { useProgress } from "@/lib/progress-context"
+import { shuffle } from "@/lib/utils"
 
 interface CuneiformGridProps {
   searchQuery: string
@@ -13,6 +15,7 @@ interface CuneiformGridProps {
 export function CuneiformGrid({ searchQuery }: CuneiformGridProps) {
   const [signs, setSigns] = useState<CuneiformSign[]>([])
   const { toast } = useToast()
+  const { isShuffled } = useProgress()
 
   // Initialize localStorage and load signs
   useEffect(() => {
@@ -125,9 +128,12 @@ export function CuneiformGrid({ searchQuery }: CuneiformGridProps) {
     )
   })
 
+  // Apply shuffle if enabled
+  const displaySigns = isShuffled ? shuffle([...filteredSigns]) : filteredSigns
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 auto-rows-fr">
-      {filteredSigns.map((sign) => (
+      {displaySigns.map((sign) => (
         <CuneiformCard key={sign.id} sign={sign} onDelete={handleDelete} onEdit={handleEdit} />
       ))}
     </div>

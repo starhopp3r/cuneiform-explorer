@@ -6,8 +6,10 @@ interface ProgressContextType {
   learnedCount: number
   totalSigns: number
   isVisible: boolean
+  isShuffled: boolean
   setTotalSigns: (value: number) => void
   toggleVisibility: () => void
+  toggleShuffle: () => void
 }
 
 const ProgressContext = createContext<ProgressContextType | undefined>(undefined)
@@ -16,6 +18,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   const [learnedCount, setLearnedCount] = useState(0)
   const [totalSigns, setTotalSigns] = useState(110)
   const [isVisible, setIsVisible] = useState(false)
+  const [isShuffled, setIsShuffled] = useState(true)
   const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
@@ -28,6 +31,10 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     const storedVisibility = localStorage.getItem('progressVisible')
     if (storedVisibility) {
       setIsVisible(storedVisibility === 'true')
+    }
+    const storedShuffle = localStorage.getItem('shuffleEnabled')
+    if (storedShuffle) {
+      setIsShuffled(storedShuffle === 'true')
     }
   }, [])
 
@@ -64,13 +71,23 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const handleToggleShuffle = () => {
+    const newValue = !isShuffled
+    setIsShuffled(newValue)
+    if (isMounted) {
+      localStorage.setItem('shuffleEnabled', newValue.toString())
+    }
+  }
+
   return (
     <ProgressContext.Provider value={{
       learnedCount,
       totalSigns,
       isVisible,
+      isShuffled,
       setTotalSigns: handleSetTotalSigns,
-      toggleVisibility: handleToggleVisibility
+      toggleVisibility: handleToggleVisibility,
+      toggleShuffle: handleToggleShuffle
     }}>
       {children}
     </ProgressContext.Provider>

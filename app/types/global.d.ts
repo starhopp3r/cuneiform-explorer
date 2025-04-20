@@ -1,10 +1,11 @@
-import { CuneiformSign } from "./types";
+import { CuneiformSign } from "@/lib/data";
 
 declare global {
   interface Window {
     cuneiformStore: {
-      signs: CuneiformSign[];
-      setSigns: (signs: CuneiformSign[]) => void;
+      getSigns: () => CuneiformSign[];
+      addSign: (sign: CuneiformSign) => void;
+      refreshSigns: () => Promise<void>;
     };
   }
 } 
