@@ -3,7 +3,7 @@
 import { ModeToggle } from "@/components/mode-toggle"
 import { Input } from "@/components/ui/input"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Suspense } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Settings2Icon } from "lucide-react"
 import {
@@ -16,6 +16,8 @@ import {
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { useProgress } from "@/lib/progress-context"
+import { getSigns } from "@/lib/storage"
+import Link from "next/link"
 
 function SearchInput() {
   const router = useRouter()
@@ -45,6 +47,20 @@ function SearchInput() {
 
 export function Header() {
   const { totalSigns, isVisible, setTotalSigns, toggleVisibility } = useProgress()
+  const [maxSigns, setMaxSigns] = useState(0)
+  const [memorizeCount, setMemorizeCount] = useState(0)
+
+  useEffect(() => {
+    const signs = getSigns()
+    setMaxSigns(signs.length)
+    // Load memorization count from localStorage
+    const storedCount = localStorage.getItem('memorizeCount')
+    if (storedCount) {
+      setMemorizeCount(parseInt(storedCount, 10))
+    } else {
+      setMemorizeCount(signs.length)
+    }
+  }, [])
 
   const handleTotalSignsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10)
@@ -53,12 +69,22 @@ export function Header() {
     }
   }
 
+  const handleMemorizeCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10)
+    if (!isNaN(value) && value > 0 && value <= maxSigns) {
+      setMemorizeCount(value)
+      localStorage.setItem('memorizeCount', value.toString())
+    }
+  }
+
   return (
     <header className="border-b">
       <div className="container mx-auto px-4 py-4 flex flex-col gap-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-4xl">𒀭</span>
+            <Link href="/" className="hover:opacity-80 transition-opacity">
+              <span className="font-semibold text-4xl">𒀭</span>
+            </Link>
           </div>
           <div className="flex items-center gap-4">
             <Suspense fallback={
@@ -91,13 +117,24 @@ export function Header() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="total-signs">Total Signs Goal</Label>
+                    <Label htmlFor="total-signs">Total Signs</Label>
                     <Input
                       id="total-signs"
                       type="number"
                       min="1"
                       value={totalSigns}
                       onChange={handleTotalSignsChange}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="memorize-count">How many signs to memorize?</Label>
+                    <Input
+                      id="memorize-count"
+                      type="number"
+                      min="1"
+                      max={maxSigns}
+                      value={memorizeCount}
+                      onChange={handleMemorizeCountChange}
                     />
                   </div>
                 </div>

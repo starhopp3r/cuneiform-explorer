@@ -2,13 +2,14 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
+import { Plus, Brain } from "lucide-react"
 import { SignForm } from "@/components/sign-form"
 import { CuneiformGrid } from "@/components/cuneiform-grid"
 import { Suspense } from "react"
 import { Progress } from "@/components/ui/progress"
 import { useSearchParams } from "next/navigation"
 import { useProgress } from "@/lib/progress-context"
+import Link from "next/link"
 
 function ProgressWithText({ value, learnedCount, totalSigns }: { value: number, learnedCount: number, totalSigns: number }) {
   return (
@@ -45,10 +46,18 @@ export default function Home() {
             />
           )}
         </div>
-        <Button onClick={() => setIsFormOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Signs
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setIsFormOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Signs
+          </Button>
+          <Button asChild>
+            <Link href="/memorize">
+              <Brain className="h-4 w-4 mr-2" />
+              Memorize
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <SignForm open={isFormOpen} onOpenChange={setIsFormOpen} />

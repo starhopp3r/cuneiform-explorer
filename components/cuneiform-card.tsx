@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import type { CuneiformSign } from "@/lib/data"
 import { EditSignDialog } from "@/components/edit-sign-dialog"
+import { toast } from "sonner"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,13 +28,36 @@ interface CuneiformCardProps {
 export function CuneiformCard({ sign, onDelete, onEdit }: CuneiformCardProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
+  const handleCopy = async (text: string, type: 'sign' | 'name') => {
+    try {
+      await navigator.clipboard.writeText(text)
+      toast.success("Copied!", {
+        description: `${type === 'sign' ? 'Cuneiform sign' : 'Sign name'} copied to clipboard`
+      })
+    } catch (err) {
+      toast.error("Failed to copy text")
+    }
+  }
+
   return (
     <>
       <Card className="overflow-hidden transition-all hover:shadow-lg group h-full relative">
         <CardContent className="p-6 h-full flex items-center justify-center">
           <div className="flex flex-col items-center">
-            <div className="text-7xl mb-4">{sign.sign}</div>
-            <h3 className="text-xl font-medium">{sign.name}</h3>
+            <button 
+              className="text-7xl mb-4 cursor-pointer transition-transform duration-200 bg-transparent border-none p-0 hover:scale-110" 
+              onClick={() => handleCopy(sign.sign, 'sign')}
+              title="Click to copy sign"
+            >
+              {sign.sign}
+            </button>
+            <button 
+              className="text-xl font-medium cursor-pointer transition-transform duration-200 bg-transparent border-none p-0 hover:scale-105"
+              onClick={() => handleCopy(sign.name, 'name')}
+              title="Click to copy name"
+            >
+              {sign.name}
+            </button>
           </div>
         </CardContent>
         <div className="absolute bottom-0 left-0 right-0 p-4 flex justify-between">
