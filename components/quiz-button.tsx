@@ -23,8 +23,8 @@ export function QuizButton({
       className={cn(
         "h-20 text-xl font-medium w-full transition-all duration-200 active:scale-[0.98] rounded-md",
         isCorrect === null && "border border-input bg-background hover:bg-accent hover:text-accent-foreground", // default
-        isCorrect !== null && isSelected && "bg-[#4CAF50] text-white dark:bg-[#00C853] dark:text-white", // correct
-        isCorrect !== null && !isSelected && "bg-[#F44336] text-white dark:bg-[#FF1744] dark:text-white" // wrong
+        isCorrect !== null && isSelected && "bg-[#4C6B4D] text-white dark:bg-[#436C48] dark:text-white", // correct
+        isCorrect !== null && !isSelected && "bg-[#7A3C3C] text-white dark:bg-[#7E3B3B] dark:text-white" // wrong
       )}
     >
       {option}
