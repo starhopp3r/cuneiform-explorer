@@ -10,6 +10,7 @@ import type { CuneiformSign } from "@/lib/data"
 import { ProgressRing } from "@/components/ui/progress-ring"
 import { getSigns } from "@/lib/storage"
 import { motion, AnimatePresence } from "framer-motion"
+import { QuizButton } from "@/components/quiz-button"
 
 export default function MemorizePage() {
   const [signs, setSigns] = useState<CuneiformSign[]>([])
@@ -263,20 +264,13 @@ export default function MemorizePage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    <Button
+                    <QuizButton
+                      option={option}
+                      isCorrect={isCorrect}
+                      isSelected={option === signs[currentIndex].name}
                       onClick={() => handleAnswer(option)}
-                      variant={
-                        isCorrect !== null
-                          ? option === signs[currentIndex].name
-                            ? "success"
-                            : "destructive"
-                          : "outline"
-                      }
-                      className="h-20 text-xl font-medium w-full transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
                       disabled={isCorrect !== null}
-                    >
-                      {option}
-                    </Button>
+                    />
                   </motion.div>
                 ))}
               </div>
