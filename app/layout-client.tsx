@@ -11,7 +11,7 @@ interface RootLayoutClientProps {
 
 export function RootLayoutClient({ children }: RootLayoutClientProps) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
       <div className="min-h-screen bg-background">
         <Header />
         <main>{children}</main>
