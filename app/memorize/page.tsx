@@ -11,6 +11,13 @@ import { ProgressRing } from "@/components/ui/progress-ring"
 import { getSigns } from "@/lib/storage"
 import { motion, AnimatePresence } from "framer-motion"
 import { QuizButton } from "@/components/quiz-button"
+import dynamic from "next/dynamic"
+import { playTrumpetSound, playCompletionSound } from "@/lib/sounds"
+
+// Dynamically import Confetti to avoid SSR issues
+const Confetti = dynamic(() => import('react-confetti'), {
+  ssr: false
+})
 
 export default function MemorizePage() {
   const [signs, setSigns] = useState<CuneiformSign[]>([])
@@ -20,6 +27,19 @@ export default function MemorizePage() {
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [score, setScore] = useState(0)
   const [isComplete, setIsComplete] = useState(false)
+  const [hasPlayedSound, setHasPlayedSound] = useState(false)
+
+  // Play appropriate sound when quiz is completed
+  useEffect(() => {
+    if (isComplete && !hasPlayedSound) {
+      if (score === signs.length) {
+        playTrumpetSound();
+      } else {
+        playCompletionSound();
+      }
+      setHasPlayedSound(true);
+    }
+  }, [isComplete, score, signs.length, hasPlayedSound]);
 
   const initializeSession = () => {
     const storedSigns = getSigns()
@@ -31,6 +51,7 @@ export default function MemorizePage() {
     setScore(0)
     setIsComplete(false)
     setIsCorrect(null)
+    setHasPlayedSound(false)
   }
 
   useEffect(() => {
@@ -134,8 +155,19 @@ export default function MemorizePage() {
 
   if (isComplete) {
     const percentage = (score / signs.length) * 100
+    const isPerfectScore = score === signs.length
+
     return (
       <div className="container mx-auto px-4 py-8">
+        {isPerfectScore && (
+          <Confetti
+            width={typeof window !== 'undefined' ? window.innerWidth : 0}
+            height={typeof window !== 'undefined' ? window.innerHeight : 0}
+            recycle={false}
+            numberOfPieces={500}
+            gravity={0.4}
+          />
+        )}
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -178,7 +210,7 @@ export default function MemorizePage() {
                 transition={{ delay: 0.4 }}
                 className="text-xl text-muted-foreground"
               >
-                {score === signs.length 
+                {isPerfectScore 
                   ? "Perfect score! Amazing work! 🎉" 
                   : score > signs.length / 2 
                     ? "Well done! Keep practicing! 👏"

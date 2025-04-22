@@ -21,3 +21,37 @@ export const playSound = (type: 'correct' | 'wrong') => {
     console.error('Error in playSound function:', error);
   }
 };
+
+export const playTrumpetSound = () => {
+  try {
+    const audio = new Audio('/sounds/trumpet.mp3');
+    audio.volume = 0.7; // Set volume to 70%
+    
+    audio.addEventListener('error', (e) => {
+      console.error('Audio error:', e);
+    });
+    
+    audio.play().catch(error => {
+      console.error('Error playing trumpet sound:', error);
+    });
+  } catch (error) {
+    console.error('Error in playTrumpetSound function:', error);
+  }
+};
+
+export const playCompletionSound = () => {
+  try {
+    const audio = new Audio('/sounds/completion.mp3');
+    audio.volume = 0.7; // Set volume to 70%
+    
+    audio.addEventListener('error', (e) => {
+      console.error('Audio error:', e);
+    });
+    
+    audio.play().catch(error => {
+      console.error('Error playing completion sound:', error);
+    });
+  } catch (error) {
+    console.error('Error in playCompletionSound function:', error);
+  }
+};
