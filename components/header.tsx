@@ -53,7 +53,18 @@ function SearchInput() {
 }
 
 export function Header() {
-  const { totalSigns, isVisible, setTotalSigns, toggleVisibility, isShuffled, toggleShuffle, selectedFont, setSelectedFont } = useProgress()
+  const { 
+    totalSigns, 
+    isVisible, 
+    setTotalSigns, 
+    toggleVisibility, 
+    isShuffled, 
+    toggleShuffle, 
+    selectedFont, 
+    setSelectedFont,
+    useEaNasirConfetti,
+    toggleEaNasirConfetti 
+  } = useProgress()
   const [maxSigns, setMaxSigns] = useState(0)
   const [memorizeCount, setMemorizeCount] = useState(0)
 
@@ -129,6 +140,17 @@ export function Header() {
                       id="progress-monitoring"
                       checked={isVisible}
                       onCheckedChange={toggleVisibility}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="ea-nasir-confetti" className="flex items-center gap-2">
+                      Ea-nāṣir's Copper Confetti
+                      <span className="text-xs text-muted-foreground">(Perfect Score)</span>
+                    </Label>
+                    <Switch
+                      id="ea-nasir-confetti"
+                      checked={useEaNasirConfetti}
+                      onCheckedChange={toggleEaNasirConfetti}
                     />
                   </div>
                   <div className="space-y-2">

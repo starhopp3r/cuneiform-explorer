@@ -8,9 +8,11 @@ interface ProgressContextType {
   isVisible: boolean
   isShuffled: boolean
   selectedFont: string
+  useEaNasirConfetti: boolean
   setTotalSigns: (value: number) => void
   toggleVisibility: () => void
   toggleShuffle: () => void
+  toggleEaNasirConfetti: () => void
   setSelectedFont: (font: string) => void
 }
 
@@ -22,6 +24,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   const [isVisible, setIsVisible] = useState(false)
   const [isShuffled, setIsShuffled] = useState(true)
   const [selectedFont, setSelectedFont] = useState('Assurbanipal')
+  const [useEaNasirConfetti, setUseEaNasirConfetti] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
@@ -42,6 +45,10 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     const storedFont = localStorage.getItem('selectedFont')
     if (storedFont) {
       setSelectedFont(storedFont)
+    }
+    const storedEaNasirConfetti = localStorage.getItem('useEaNasirConfetti')
+    if (storedEaNasirConfetti) {
+      setUseEaNasirConfetti(storedEaNasirConfetti === 'true')
     }
   }, [])
 
@@ -93,6 +100,14 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const handleToggleEaNasirConfetti = () => {
+    const newValue = !useEaNasirConfetti
+    setUseEaNasirConfetti(newValue)
+    if (isMounted) {
+      localStorage.setItem('useEaNasirConfetti', newValue.toString())
+    }
+  }
+
   return (
     <ProgressContext.Provider value={{
       learnedCount,
@@ -100,9 +115,11 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       isVisible,
       isShuffled,
       selectedFont,
+      useEaNasirConfetti,
       setTotalSigns: handleSetTotalSigns,
       toggleVisibility: handleToggleVisibility,
       toggleShuffle: handleToggleShuffle,
+      toggleEaNasirConfetti: handleToggleEaNasirConfetti,
       setSelectedFont: handleSetFont
     }}>
       {children}

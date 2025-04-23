@@ -12,13 +12,8 @@ import { getSigns } from "@/lib/storage"
 import { motion, AnimatePresence } from "framer-motion"
 import { QuizButton } from "@/components/quiz-button"
 import { useProgress } from "@/lib/progress-context"
-import dynamic from "next/dynamic"
+import { CustomConfetti } from "@/components/ui/custom-confetti"
 import { playTrumpetSound, playCompletionSound } from "@/lib/sounds"
-
-// Dynamically import Confetti to avoid SSR issues
-const Confetti = dynamic(() => import('react-confetti'), {
-  ssr: false
-})
 
 export default function MemorizePage() {
   const [signs, setSigns] = useState<CuneiformSign[]>([])
@@ -29,7 +24,7 @@ export default function MemorizePage() {
   const [score, setScore] = useState(0)
   const [isComplete, setIsComplete] = useState(false)
   const [hasPlayedSound, setHasPlayedSound] = useState(false)
-  const { selectedFont } = useProgress()
+  const { selectedFont, useEaNasirConfetti } = useProgress()
 
   // Play appropriate sound when quiz is completed
   useEffect(() => {
@@ -162,13 +157,7 @@ export default function MemorizePage() {
     return (
       <div className="container mx-auto px-4 py-8">
         {isPerfectScore && (
-          <Confetti
-            width={typeof window !== 'undefined' ? window.innerWidth : 0}
-            height={typeof window !== 'undefined' ? window.innerHeight : 0}
-            recycle={false}
-            numberOfPieces={500}
-            gravity={0.4}
-          />
+          <CustomConfetti useEaNasir={useEaNasirConfetti} />
         )}
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
