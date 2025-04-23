@@ -7,9 +7,11 @@ interface ProgressContextType {
   totalSigns: number
   isVisible: boolean
   isShuffled: boolean
+  selectedFont: string
   setTotalSigns: (value: number) => void
   toggleVisibility: () => void
   toggleShuffle: () => void
+  setSelectedFont: (font: string) => void
 }
 
 const ProgressContext = createContext<ProgressContextType | undefined>(undefined)
@@ -19,6 +21,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   const [totalSigns, setTotalSigns] = useState(110)
   const [isVisible, setIsVisible] = useState(false)
   const [isShuffled, setIsShuffled] = useState(true)
+  const [selectedFont, setSelectedFont] = useState('Assurbanipal')
   const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
@@ -35,6 +38,10 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     const storedShuffle = localStorage.getItem('shuffleEnabled')
     if (storedShuffle) {
       setIsShuffled(storedShuffle === 'true')
+    }
+    const storedFont = localStorage.getItem('selectedFont')
+    if (storedFont) {
+      setSelectedFont(storedFont)
     }
   }, [])
 
@@ -79,15 +86,24 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const handleSetFont = (font: string) => {
+    setSelectedFont(font)
+    if (isMounted) {
+      localStorage.setItem('selectedFont', font)
+    }
+  }
+
   return (
     <ProgressContext.Provider value={{
       learnedCount,
       totalSigns,
       isVisible,
       isShuffled,
+      selectedFont,
       setTotalSigns: handleSetTotalSigns,
       toggleVisibility: handleToggleVisibility,
-      toggleShuffle: handleToggleShuffle
+      toggleShuffle: handleToggleShuffle,
+      setSelectedFont: handleSetFont
     }}>
       {children}
     </ProgressContext.Provider>

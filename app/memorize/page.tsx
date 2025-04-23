@@ -11,6 +11,7 @@ import { ProgressRing } from "@/components/ui/progress-ring"
 import { getSigns } from "@/lib/storage"
 import { motion, AnimatePresence } from "framer-motion"
 import { QuizButton } from "@/components/quiz-button"
+import { useProgress } from "@/lib/progress-context"
 import dynamic from "next/dynamic"
 import { playTrumpetSound, playCompletionSound } from "@/lib/sounds"
 
@@ -28,6 +29,7 @@ export default function MemorizePage() {
   const [score, setScore] = useState(0)
   const [isComplete, setIsComplete] = useState(false)
   const [hasPlayedSound, setHasPlayedSound] = useState(false)
+  const { selectedFont } = useProgress()
 
   // Play appropriate sound when quiz is completed
   useEffect(() => {
@@ -281,7 +283,8 @@ export default function MemorizePage() {
                   initial={{ scale: 0.9 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 200 }}
-                  className="text-9xl mb-6 font-serif"
+                  className="text-9xl mb-6"
+                  style={{ fontFamily: selectedFont }}
                 >
                   {signs[currentIndex].sign}
                 </motion.div>

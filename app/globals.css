@@ -1,3 +1,48 @@
+@font-face {
+  font-family: 'Assurbanipal';
+  src: url('/fonts/Assurbanipal.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Bisitun';
+  src: url('/fonts/Bisitun.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Esagil';
+  src: url('/fonts/Esagil.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Persepolis';
+  src: url('/fonts/Persepolis.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Santakku';
+  src: url('/fonts/Santakku.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'SantakkuM';
+  src: url('/fonts/SantakkuM.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'UllikummiA';
+  src: url('/fonts/UllikummiA.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'UllikummiB';
+  src: url('/fonts/UllikummiB.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'UllikummiC';
+  src: url('/fonts/UllikummiC.ttf') format('truetype');
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

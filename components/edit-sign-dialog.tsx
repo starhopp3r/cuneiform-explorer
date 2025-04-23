@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { useProgress } from "@/lib/progress-context"
 
 const formSchema = z.object({
   sign: z.string().min(1, "Sign is required"),
@@ -21,6 +22,7 @@ interface EditSignDialogProps {
 }
 
 export function EditSignDialog({ sign, open, onOpenChange, onSave }: EditSignDialogProps) {
+  const { selectedFont } = useProgress()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -53,7 +55,7 @@ export function EditSignDialog({ sign, open, onOpenChange, onSave }: EditSignDia
                 <FormItem>
                   <FormLabel>Sign</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} style={{ fontFamily: selectedFont }} className="text-2xl" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

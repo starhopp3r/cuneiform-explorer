@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form"
 import * as z from "zod"
 import type { CuneiformSign } from "@/lib/data"
 import { Upload, Plus } from "lucide-react"
+import { useProgress } from "@/lib/progress-context"
 
 const formSchema = z.object({
   sign: z.string().min(1, "Sign is required"),
@@ -29,6 +30,7 @@ export function SignForm({ open, onOpenChange }: SignFormProps) {
   const [importText, setImportText] = useState("")
   const [isImporting, setIsImporting] = useState(false)
   const [showImport, setShowImport] = useState(false)
+  const { selectedFont } = useProgress()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -165,7 +167,12 @@ export function SignForm({ open, onOpenChange }: SignFormProps) {
                       <FormItem>
                         <FormLabel>Sign</FormLabel>
                         <FormControl>
-                          <Input placeholder="𒀀" {...field} />
+                          <Input 
+                            placeholder="𒀀" 
+                            {...field} 
+                            style={{ fontFamily: selectedFont }}
+                            className="text-2xl"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -215,11 +222,13 @@ export function SignForm({ open, onOpenChange }: SignFormProps) {
                     hover:file:bg-primary/90"
                 />
               </div>
+              <p className="text-sm text-gray-500">Paste signs below (one per line, tab-separated)</p>
               <Textarea
-                placeholder="Paste signs here (one per line, tab-separated)"
                 value={importText}
                 onChange={(e) => setImportText(e.target.value)}
                 rows={10}
+                style={{ fontFamily: selectedFont }}
+                className="text-lg"
               />
               <Button onClick={handleImport} disabled={isImporting} className="w-full">
                 {isImporting ? "Importing..." : "Import Signs"}

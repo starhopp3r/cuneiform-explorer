@@ -15,6 +15,13 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useProgress } from "@/lib/progress-context"
 import { getSigns } from "@/lib/storage"
 import Link from "next/link"
@@ -46,7 +53,7 @@ function SearchInput() {
 }
 
 export function Header() {
-  const { totalSigns, isVisible, setTotalSigns, toggleVisibility, isShuffled, toggleShuffle } = useProgress()
+  const { totalSigns, isVisible, setTotalSigns, toggleVisibility, isShuffled, toggleShuffle, selectedFont, setSelectedFont } = useProgress()
   const [maxSigns, setMaxSigns] = useState(0)
   const [memorizeCount, setMemorizeCount] = useState(0)
 
@@ -83,7 +90,7 @@ export function Header() {
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Link href="/" className="hover:opacity-80 transition-opacity">
-              <span className="font-semibold text-4xl">𒀭</span>
+              <span className="font-semibold text-4xl" style={{ fontFamily: selectedFont }}>𒀭</span>
             </Link>
           </div>
           <div className="flex items-center gap-4">
@@ -123,6 +130,25 @@ export function Header() {
                       checked={isVisible}
                       onCheckedChange={toggleVisibility}
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cuneiform-font">Cuneiform Font</Label>
+                    <Select value={selectedFont} onValueChange={setSelectedFont}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a font" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Assurbanipal">Assurbanipal</SelectItem>
+                        <SelectItem value="Bisitun">Bisitun</SelectItem>
+                        <SelectItem value="Esagil">Esagil</SelectItem>
+                        <SelectItem value="Persepolis">Persepolis</SelectItem>
+                        <SelectItem value="Santakku">Santakku</SelectItem>
+                        <SelectItem value="SantakkuM">SantakkuM</SelectItem>
+                        <SelectItem value="UllikummiA">UllikummiA</SelectItem>
+                        <SelectItem value="UllikummiB">UllikummiB</SelectItem>
+                        <SelectItem value="UllikummiC">UllikummiC</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="total-signs">How many signs do you want to learn?</Label>

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import type { CuneiformSign } from "@/lib/data"
 import { EditSignDialog } from "@/components/edit-sign-dialog"
 import { toast } from "sonner"
+import { useProgress } from "@/lib/progress-context"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,6 +28,7 @@ interface CuneiformCardProps {
 
 export function CuneiformCard({ sign, onDelete, onEdit }: CuneiformCardProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const { selectedFont } = useProgress()
 
   const handleCopy = async (text: string, type: 'sign' | 'name') => {
     try {
@@ -48,6 +50,7 @@ export function CuneiformCard({ sign, onDelete, onEdit }: CuneiformCardProps) {
               className="text-7xl mb-4 cursor-pointer transition-transform duration-200 bg-transparent border-none p-0 hover:scale-110" 
               onClick={() => handleCopy(sign.sign, 'sign')}
               title="Click to copy sign"
+              style={{ fontFamily: selectedFont }}
             >
               {sign.sign}
             </button>
@@ -84,7 +87,7 @@ export function CuneiformCard({ sign, onDelete, onEdit }: CuneiformCardProps) {
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This will permanently delete the cuneiform sign "{sign.sign}" ({sign.name}).
+                  This will permanently delete the cuneiform sign <span style={{ fontFamily: selectedFont }}>"{sign.sign}"</span> ({sign.name}).
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
