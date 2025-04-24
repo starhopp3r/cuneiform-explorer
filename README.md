@@ -53,20 +53,6 @@ pnpm dev
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-## Cuneiform Font
-
-The cuneiform font is not built into the website, as different users may have different font preferences. If you'd like to use the same font shown in the screenshot, you can download the Assurbanipal cuneiform font from [https://www.hethport.uni-wuerzburg.de/cuneifont](https://www.hethport.uni-wuerzburg.de/cuneifont)
-
-To set it up:
-
-**Google Chrome**
-
-Go to `Settings > Appearance > Customize fonts > Standard font`, and select `Assurbanipal`.
-
-**Firefox**
-
-Go to `Settings > General > Fonts > Advanced`, then set Sans-serif to `Assurbanipal`.
-
 ## Project Structure
 
 ```

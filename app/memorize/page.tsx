@@ -14,6 +14,7 @@ import { QuizButton } from "@/components/quiz-button"
 import { useProgress } from "@/lib/progress-context"
 import { CustomConfetti } from "@/components/ui/custom-confetti"
 import { playTrumpetSound, playCompletionSound } from "@/lib/sounds"
+import { useTimer } from "@/hooks/useTimer"
 
 export default function MemorizePage() {
   const [signs, setSigns] = useState<CuneiformSign[]>([])
@@ -25,6 +26,7 @@ export default function MemorizePage() {
   const [isComplete, setIsComplete] = useState(false)
   const [hasPlayedSound, setHasPlayedSound] = useState(false)
   const { selectedFont, useEaNasirConfetti } = useProgress()
+  const { formattedTime, start, stop, reset, time } = useTimer()
 
   // Play appropriate sound when quiz is completed
   useEffect(() => {
@@ -35,8 +37,9 @@ export default function MemorizePage() {
         playCompletionSound();
       }
       setHasPlayedSound(true);
+      stop();
     }
-  }, [isComplete, score, signs.length, hasPlayedSound]);
+  }, [isComplete, score, signs.length, hasPlayedSound, stop]);
 
   const initializeSession = () => {
     const storedSigns = getSigns()
@@ -49,7 +52,25 @@ export default function MemorizePage() {
     setIsComplete(false)
     setIsCorrect(null)
     setHasPlayedSound(false)
+    reset()
+    start()
   }
+
+  // Save session data when completed
+  useEffect(() => {
+    if (isComplete) {
+      const sessionData = {
+        id: Date.now(),
+        date: new Date().toISOString(),
+        score,
+        total: signs.length,
+        time,
+        speed: Math.round(signs.length / (time / 60) * 10) / 10
+      }
+      const existingSessions = JSON.parse(localStorage.getItem('sessionMetrics') || '[]')
+      localStorage.setItem('sessionMetrics', JSON.stringify([...existingSessions, sessionData]))
+    }
+  }, [isComplete, score, signs.length, time])
 
   useEffect(() => {
     initializeSession()
@@ -174,26 +195,52 @@ export default function MemorizePage() {
                 Session Complete!
               </motion.h2>
               
-              <motion.div 
-                className="flex justify-center"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: "spring" }}
-              >
-                <ProgressRing 
-                  value={percentage}
-                  size={220}
-                  strokeWidth={12}
-                  valueClassName="text-primary"
+              <div className="grid grid-cols-2 gap-6">
+                <motion.div 
+                  className="col-span-2"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: "spring" }}
                 >
-                  <div className="text-center">
-                    <div className="text-6xl font-bold">
-                      {score}
-                      <span className="text-2xl text-muted-foreground font-normal">&nbsp;/&nbsp;{signs.length}</span>
+                  <ProgressRing 
+                    value={percentage}
+                    size={220}
+                    strokeWidth={12}
+                    valueClassName="text-primary"
+                  >
+                    <div className="text-center">
+                      <div className="text-6xl font-bold">
+                        {score}
+                        <span className="text-2xl text-muted-foreground font-normal">&nbsp;/&nbsp;{signs.length}</span>
+                      </div>
                     </div>
+                  </ProgressRing>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="flex flex-col items-center justify-center p-4 rounded-xl border bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/30"
+                >
+                  <div className="text-sm text-muted-foreground font-medium uppercase tracking-wider mb-1">Speed</div>
+                  <div className="text-3xl font-bold text-primary tabular-nums">
+                    {Math.round(signs.length / (time / 60) * 10) / 10}
                   </div>
-                </ProgressRing>
-              </motion.div>
+                  <div className="text-xs text-muted-foreground">signs/min</div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="flex flex-col items-center justify-center p-4 rounded-xl border bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/30"
+                >
+                  <div className="text-sm text-muted-foreground font-medium uppercase tracking-wider mb-1">Time</div>
+                  <div className="text-3xl font-bold text-primary tabular-nums">{formattedTime}</div>
+                  <div className="text-xs text-muted-foreground">total time</div>
+                </motion.div>
+              </div>
 
               <motion.p 
                 initial={{ opacity: 0 }}
@@ -209,7 +256,7 @@ export default function MemorizePage() {
               </motion.p>
 
               <motion.div 
-                className="flex flex-col gap-3"
+                className="flex gap-3"
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.6 }}
@@ -217,12 +264,12 @@ export default function MemorizePage() {
                 <Button 
                   onClick={initializeSession} 
                   size="lg" 
-                  className="w-full bg-primary hover:bg-primary/90 transition-colors duration-200"
+                  className="flex-1 bg-primary hover:bg-primary/90 transition-colors duration-200"
                 >
                   <RotateCw className="h-4 w-4 mr-2" />
                   Try Again
                 </Button>
-                <Button variant="outline" size="lg" asChild className="w-full">
+                <Button size="lg" asChild className="flex-1 bg-primary hover:bg-primary/90 transition-colors duration-200">
                   <Link href="/">
                     <Home className="h-4 w-4 mr-2" />
                     Go Home
@@ -248,12 +295,18 @@ export default function MemorizePage() {
         <motion.div 
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="flex items-center gap-1.5 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-full border px-6 py-2 shadow-sm"
+          className="flex items-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-full border px-5 py-2 shadow-sm"
         >
-          <span className="text-2xl font-semibold text-primary">{score}</span>
-          <span className="text-muted-foreground font-medium">/</span>
-          <span className="text-muted-foreground font-medium">{signs.length}</span>
-          <span className="text-muted-foreground text-sm ml-1.5">correct</span>
+          <div className="flex items-center w-[90px]">
+            <span className="text-2xl font-semibold text-primary tabular-nums">{score}</span>
+            <span className="text-muted-foreground font-medium mx-1">/</span>
+            <span className="text-muted-foreground font-medium">{signs.length}</span>
+            <span className="text-muted-foreground text-sm ml-1">correct</span>
+          </div>
+          <div className="w-px h-6 bg-border mx-3" />
+          <div className="flex items-center justify-end w-[65px]">
+            <span className="text-2xl font-semibold text-primary tabular-nums">{formattedTime}</span>
+          </div>
         </motion.div>
       </div>
 
