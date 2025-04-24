@@ -295,16 +295,16 @@ export default function MemorizePage() {
         <motion.div 
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="flex items-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-full border px-5 py-2 shadow-sm"
+          className="inline-flex items-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-full border px-5 py-2 shadow-sm"
         >
-          <div className="flex items-center w-[90px]">
+          <div className="flex items-center">
             <span className="text-2xl font-semibold text-primary tabular-nums">{score}</span>
             <span className="text-muted-foreground font-medium mx-1">/</span>
             <span className="text-muted-foreground font-medium">{signs.length}</span>
             <span className="text-muted-foreground text-sm ml-1">correct</span>
           </div>
           <div className="w-px h-6 bg-border mx-3" />
-          <div className="flex items-center justify-end w-[65px]">
+          <div className="flex items-center">
             <span className="text-2xl font-semibold text-primary tabular-nums">{formattedTime}</span>
           </div>
         </motion.div>
