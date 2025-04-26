@@ -26,8 +26,8 @@ import {
 } from "@/components/ui/alert-dialog"
 import { motion } from "framer-motion"
 import {
-  LineChart as RechartsLineChart,
-  Line,
+  AreaChart as RechartsAreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -36,6 +36,12 @@ import {
   Legend
 } from "recharts"
 import { format } from "date-fns"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 interface SessionData {
   id: number
@@ -46,8 +52,11 @@ interface SessionData {
   speed: number
 }
 
+type MetricType = "speed" | "score"
+
 export default function AnalyticsPage() {
   const [sessions, setSessions] = useState<SessionData[]>([])
+  const [selectedMetric, setSelectedMetric] = useState<MetricType>("speed")
 
   useEffect(() => {
     const storedSessions = JSON.parse(localStorage.getItem('sessionMetrics') || '[]')
@@ -142,19 +151,55 @@ export default function AnalyticsPage() {
         ) : (
           <>
             <Card className="p-6">
+              <div className="flex justify-end mb-4">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="justify-between">
+                      <LineChart className="h-4 w-4 ml-2" />
+                      {selectedMetric === "speed" ? "Speed (signs/min)" : "Score (%)"}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => setSelectedMetric("speed")}>
+                      Speed (signs/min)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSelectedMetric("score")}>
+                      Score (%)
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
               <div className="h-[400px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <RechartsLineChart
-                    data={[...sessions].reverse()}
+                  <RechartsAreaChart
+                    data={[...sessions].reverse().map(session => ({
+                      ...session,
+                      scorePercentage: Math.round((session.score / session.total) * 100)
+                    }))}
                     margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                     <XAxis 
                       dataKey="date" 
                       tickFormatter={(date) => format(new Date(date), 'MMM d')}
+                      label={{ 
+                        value: 'Date', 
+                        position: 'bottom',
+                        style: { fill: 'var(--muted-foreground)' }
+                      }}
                     />
-                    <YAxis yAxisId="left" />
-                    <YAxis yAxisId="right" orientation="right" />
+                    <YAxis 
+                      label={{ 
+                        value: selectedMetric === "speed" ? 'Speed (signs/min)' : 'Score (%)',
+                        angle: -90,
+                        position: 'insideLeft',
+                        offset: 0,
+                        style: { 
+                          fill: 'var(--muted-foreground)',
+                          textAnchor: 'middle'
+                        }
+                      }}
+                    />
                     <Tooltip
                       labelFormatter={(date) => format(new Date(date), 'MMM d, yyyy HH:mm')}
                       contentStyle={{
@@ -162,27 +207,24 @@ export default function AnalyticsPage() {
                         border: '1px solid var(--border)',
                         borderRadius: '8px'
                       }}
+                      formatter={(value: number) => {
+                        if (selectedMetric === "speed") {
+                          return [`${value} signs/min`, "Speed"]
+                        } else {
+                          return [`${value}%`, "Score"]
+                        }
+                      }}
                     />
-                    <Legend />
-                    <Line
-                      yAxisId="left"
+                    <Area
                       type="monotone"
-                      dataKey="speed"
-                      name="Speed (signs/min)"
-                      stroke="var(--primary)"
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                    <Line
-                      yAxisId="right"
-                      type="monotone"
-                      dataKey="score"
-                      name="Score"
+                      dataKey={selectedMetric === "speed" ? "speed" : "scorePercentage"}
+                      name={selectedMetric === "speed" ? "Speed" : "Score"}
                       stroke="#10B981"
+                      fill="#10B981"
+                      fillOpacity={0.2}
                       strokeWidth={2}
-                      dot={false}
                     />
-                  </RechartsLineChart>
+                  </RechartsAreaChart>
                 </ResponsiveContainer>
               </div>
             </Card>

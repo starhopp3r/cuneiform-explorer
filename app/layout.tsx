@@ -6,6 +6,7 @@ import { RootLayoutClient } from "./layout-client"
 import { ProgressProvider } from "@/lib/progress-context"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
+import MobileWarning from "@/components/MobileWarning"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -40,6 +41,7 @@ export default function RootLayout({
         >
           <ProgressProvider>
             <RootLayoutClient>{children}</RootLayoutClient>
+            <MobileWarning />
           </ProgressProvider>
           <Toaster />
         </ThemeProvider>
