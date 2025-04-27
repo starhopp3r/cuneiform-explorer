@@ -59,7 +59,7 @@ pnpm dev
 cuneiform-explorer/
 ├── app/                # Next.js app directory
 │   ├── api/            # API routes
-│   ├── memorize/       # Memorization features
+│   ├── quiz/       # Quiz features
 │   ├── types/          # TypeScript type definitions
 │   └── ...
 ├── components/         # Reusable UI components

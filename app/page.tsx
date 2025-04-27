@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Plus, Brain, BarChart } from "lucide-react"
+import { Plus, FilePenLine, BarChart, Brain } from "lucide-react"
 import { SignForm } from "@/components/sign-form"
 import { CuneiformGrid } from "@/components/cuneiform-grid"
 import { Suspense } from "react"
@@ -55,6 +55,12 @@ export default function Home() {
             <Link href="/memorize">
               <Brain className="h-4 w-4 mr-2" />
               Memorize
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href="/quiz">
+              <FilePenLine className="h-4 w-4 mr-2" />
+              Quiz
             </Link>
           </Button>
           <Button asChild>

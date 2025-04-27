@@ -1,57 +1,30 @@
-export const playSound = (type: 'correct' | 'wrong') => {
-  try {
-    const soundPath = type === 'correct' ? '/sounds/correct.mp3' : '/sounds/wrong.mp3';
-    const audio = new Audio(soundPath);
-    audio.volume = 0.7; // Set volume to 70%
-    
-    // Add event listeners for debugging
-    audio.addEventListener('error', (e) => {
-      console.error('Audio error:', e);
-    });
-    
-    audio.play().catch(error => {
-      console.error('Error playing sound:', error);
-      console.error('Error details:', {
-        name: error.name,
-        message: error.message,
-        stack: error.stack
-      });
-    });
-  } catch (error) {
-    console.error('Error in playSound function:', error);
-  }
-};
+// Sound effects for the application
+const playSound = (url: string) => {
+  const audio = new Audio(url)
+  audio.volume = 0.3 // Set volume to 30%
+  audio.play()
+}
+
+export const playCorrectSound = () => {
+  playSound('/sounds/correct.mp3')
+}
+
+export const playWrongSound = () => {
+  playSound('/sounds/wrong.mp3')
+}
 
 export const playTrumpetSound = () => {
-  try {
-    const audio = new Audio('/sounds/trumpet.mp3');
-    audio.volume = 0.7; // Set volume to 70%
-    
-    audio.addEventListener('error', (e) => {
-      console.error('Audio error:', e);
-    });
-    
-    audio.play().catch(error => {
-      console.error('Error playing trumpet sound:', error);
-    });
-  } catch (error) {
-    console.error('Error in playTrumpetSound function:', error);
-  }
-};
+  playSound('/sounds/trumpet.mp3')
+}
 
 export const playCompletionSound = () => {
-  try {
-    const audio = new Audio('/sounds/completion.mp3');
-    audio.volume = 0.7; // Set volume to 70%
-    
-    audio.addEventListener('error', (e) => {
-      console.error('Audio error:', e);
-    });
-    
-    audio.play().catch(error => {
-      console.error('Error playing completion sound:', error);
-    });
-  } catch (error) {
-    console.error('Error in playCompletionSound function:', error);
-  }
-};
+  playSound('/sounds/completion.mp3')
+}
+
+export const playCardFlipSound = () => {
+  playSound('/sounds/card-flip.mp3')
+}
+
+export const playCardFlipAnimationSound = () => {
+  playSound('/sounds/card-flip-animation.mp3')
+}

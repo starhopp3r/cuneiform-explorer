@@ -66,17 +66,29 @@ export function Header() {
     toggleEaNasirConfetti 
   } = useProgress()
   const [maxSigns, setMaxSigns] = useState(0)
+  const [quizCount, setQuizCount] = useState(0)
   const [memorizeCount, setMemorizeCount] = useState(0)
+  const [memorizeMode, setMemorizeMode] = useState<'cuneiform' | 'name'>('cuneiform')
 
   useEffect(() => {
     const signs = getSigns()
     setMaxSigns(signs.length)
-    // Load memorization count from localStorage
-    const storedCount = localStorage.getItem('memorizeCount')
-    if (storedCount) {
-      setMemorizeCount(parseInt(storedCount, 10))
+    // Load counts from localStorage
+    const storedQuizCount = localStorage.getItem('quizCount')
+    const storedMemorizeCount = localStorage.getItem('memorizeCount')
+    const storedMemorizeMode = localStorage.getItem('memorizeMode') as 'cuneiform' | 'name'
+    if (storedQuizCount) {
+      setQuizCount(parseInt(storedQuizCount, 10))
+    } else {
+      setQuizCount(signs.length)
+    }
+    if (storedMemorizeCount) {
+      setMemorizeCount(parseInt(storedMemorizeCount, 10))
     } else {
       setMemorizeCount(signs.length)
+    }
+    if (storedMemorizeMode) {
+      setMemorizeMode(storedMemorizeMode)
     }
   }, [])
 
@@ -87,12 +99,21 @@ export function Header() {
     }
   }
 
+  const handleQuizCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10)
+    setQuizCount(value)
+    localStorage.setItem('quizCount', value.toString())
+  }
+
   const handleMemorizeCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10)
-    if (!isNaN(value) && value > 0 && value <= maxSigns) {
-      setMemorizeCount(value)
-      localStorage.setItem('memorizeCount', value.toString())
-    }
+    setMemorizeCount(value)
+    localStorage.setItem('memorizeCount', value.toString())
+  }
+
+  const handleMemorizeModeChange = (value: string) => {
+    setMemorizeMode(value as 'cuneiform' | 'name')
+    localStorage.setItem('memorizeMode', value)
   }
 
   return (
@@ -154,6 +175,18 @@ export function Header() {
                     />
                   </div>
                   <div className="space-y-2">
+                    <Label htmlFor="memorize-mode">What do you want to memorize?</Label>
+                    <Select value={memorizeMode} onValueChange={handleMemorizeModeChange}>
+                      <SelectTrigger id="memorize-mode">
+                        <SelectValue placeholder="Select what to memorize" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cuneiform">Cuneiform Signs</SelectItem>
+                        <SelectItem value="name">Sign Names</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
                     <Label htmlFor="cuneiform-font">Cuneiform Font</Label>
                     <Select value={selectedFont} onValueChange={setSelectedFont}>
                       <SelectTrigger>
@@ -180,6 +213,17 @@ export function Header() {
                       min="1"
                       value={totalSigns}
                       onChange={handleTotalSignsChange}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="quiz-count">How many signs do you want to quiz?</Label>
+                    <Input
+                      id="quiz-count"
+                      type="number"
+                      min="1"
+                      max={maxSigns}
+                      value={quizCount}
+                      onChange={handleQuizCountChange}
                     />
                   </div>
                   <div className="space-y-2">
